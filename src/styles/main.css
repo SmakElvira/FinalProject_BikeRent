@@ -1,0 +1,211 @@
+@import './reset.css';
+/* @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap');
+
+/* 
+font-family: 'DM Sans', sans-serif;
+font-family: 'Poppins', sans-serif; 
+*/
+
+:root {
+    --black: black;
+    --black-boarder: black;
+    --blue: #5970FF;
+    --white: white;
+
+
+}
+
+html, body {
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 15px;
+    max-width: 1200px;
+}
+
+/* Header */
+
+.nav {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--blue);
+    background-color: var(--blue);
+}
+
+.nav-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 30px;
+    row-gap: 20px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: var(--black);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.logo:hover {
+    color: var(--white);
+    transition: 0.2s;
+}
+
+.nav-list {
+    display: flex;
+    align-items: center;
+    column-gap: 40px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.nav-list__link {
+    color: var(--black);
+}
+
+.nav-list__link:hover {
+    color: var(--white);
+    transition: 0.2s;
+}
+
+.nav-list__link--active {
+    position: relative;
+}
+
+.nav-list__link--active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 100%;
+
+    display: block;
+    height: 1.5px;
+    width: 100%;
+    background-color: var(--black);
+}
+
+/* Main */
+
+.main {
+    padding: 10px 0;
+    min-height: 695px;
+    display: flex;
+    justify-content: center;
+}
+
+.main__wrapper {
+    padding: 0 15px;
+    max-width: 660px;
+}
+
+.main__title {
+    font-size: 50px;
+    font-weight: 700;
+}
+
+.main__p {
+    font-size: 20px;
+    font-weight: 400;
+    padding: 10px;
+}
+
+.main__img {
+    height: 100%;
+    width: 100%;
+    border-radius: 20px;
+}
+
+/* Thefts */
+
+.info-list__item {
+    padding: 5px;
+    margin: 5px;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 5px;
+    box-shadow: 5px 5px 15px rgb(184, 183, 183);
+    column-gap: 10px;
+}
+
+.item {
+    color: var(--black);
+}
+
+.item:hover {
+    color: var(--blue);
+}
+
+/* Button */
+
+.btn {
+    background-color: var(--blue);
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: var(--black);
+}
+
+.btn__big {
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn:active {
+    background-color: grey;
+}
+
+/* Info about theft */
+
+.select {
+    margin: 10px;
+}
+
+/* Report */
+
+.item__input {
+    border: 1px solid var(--black);
+    border-radius: 5px;
+    padding: 5px;
+    text-align: end;
+    width: max-content;
+}
+
+/* Login */
+
+.log-in__log, .log-in__reg {
+    color: var(--black);
+}
+
+.log-in__log:hover, .log-in__reg:hover {
+    color: var(--white);
+    transition: 0.2s;
+}
+
+/* Footer */
+
+.img-bike {
+    width: 100px;
+    height: 100px;
+}
+
+.footer-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+@media (max-width: 620px) {
+    .main {
+        min-height: unset;
+    }
+
+    .main__title {
+        font-size: 30px;
+    }
+}
