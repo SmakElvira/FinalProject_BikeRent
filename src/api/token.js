@@ -1,17 +1,13 @@
 const namespace = 'auth-token';
 
-const getToken = () => {
+export const getToken = () => {
     return localStorage.getItem(namespace);
 };
 
-const setToken = (token) => {
+export const setToken = (token) => {
     return localStorage.setItem(namespace, token);
 };
 
-const removeToken = () => {
+export const removeToken = () => {
     return localStorage.removeItem(namespace);
-}
-
-export {
-    getToken, setToken, removeToken
-}
+};

@@ -1,7 +1,6 @@
-// import * as yup from 'yup';
 import { object, string } from "yup";
 
-export const regFields = [
+export const regField = [
     {id: 1, label: 'Email', name: 'email', type: "text"},
     {id: 2, label: 'Пароль', name: 'password', type: "password"},
     {id: 3, label: 'Имя', name: 'firstName', type: "text"},
@@ -9,7 +8,7 @@ export const regFields = [
     {id: 5, label: 'Client ID', name: 'clientId', type: "text"},
 ];
 
-export const regFieldValue = { email: '', password: '', firstName: '', lastName: '', clientId: ''};
+export const regFieldValue = { email: '', password: '', firstName: '', lastName: '', clientId: '' };
 
 export const regValidSchema = object().shape({
     email: string().email('Неверный E-mail').required('Заполните поле'),

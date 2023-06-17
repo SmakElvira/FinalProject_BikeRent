@@ -1,14 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
 import { Provider } from 'react-redux';
-import { store } from './store';
+
+import App from './App';
+import store from './store/store';
+import { fetchMe } from './store/userSlice';
+import { getToken } from './api/token';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+if (getToken()) {
+  store.dispatch(fetchMe())
+}
+
 root.render(
-  <Provider store={store}>
+  <Provider store={ store }>
       <React.StrictMode>
-        <App />
+          <App />
       </React.StrictMode>
   </Provider>
 );

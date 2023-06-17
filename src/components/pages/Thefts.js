@@ -1,71 +1,60 @@
-import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import OneTheft from "../oneList/OneTheft";
+import React from "react";
 import { useEffect, useState } from "react";
-import axios from "axios";
-//import { RequireAuth } from "../../hoc/RequireAuth";
+import { useSelector } from 'react-redux';
+
+import { user } from '../../store/user';
+import { getReports } from "../../api/thifts";
+import { checkAuth } from "../../utils/checkAuth";
+
+import OneList from '../oneList/OneList';
 
 function Thefts () {
 
-    const dispatch = useDispatch()
-    const thefts = useSelector(state => state.thefts)
+    const userData = useSelector(user);
 
-    const deleteTheft = (key) => {
-        dispatch({type: 'DELETE_THEFT', payload: key})
-    }
+    const [reports, setReports] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
-    //const [thefts, setThefts] = useState([]);
+    useEffect(() => {
+        if (checkAuth(userData.data, userData.status)) {
+            getReports()
+            .then((data) => setReports(data.data))
+            .catch(() => setErrorMessage('Ошибка получения информации о кражах'))
+        } else {
+            window.location.href = '/'
+        }
+    }, [userData.data, userData.status]);
 
-    // useEffect(() => {
-    //     axios
-    //         .get('https://sf-final-project-be.herokuapp.com/api/cases/') 
-    //         .then (data => {
-    //             setThefts(data.data);
-    //         })
-    //         .catch((error) => {
-    //             console.error(error);
-    //         });
-    // })
+    const reportsIsLoaded = userData.data && userData.status === 'fulfilled' && reports
 
-    // console.log(thefts);
-    
-    return (
-        <main className="main">
+  return (
+    <main className="main">
+        {
+        errorMessage ?
+        <p className="system-message">Ошибка получения информации о кражах</p>
+        :
+        reportsIsLoaded && !errorMessage ?
         <div className="container">
-            <h1 className="main__title">
-                Сообщения о кражах
-            </h1>
-            {thefts.length > 0 ?
-                <ul className="info-list">
-                    {thefts.map((theft, index) => {
-                        return(
-                            //<RequireAuth>
-                                <OneTheft 
-                                    keys={theft.key}
-                                    id={index} 
-                                    license={theft.licenseNumber} 
-                                    nameClient={theft.ownerFullName} 
-                                    status={theft.status}
-                                    deleteTheft={deleteTheft} 
-                                />
-                            //</RequireAuth>
-                        )
-                    })}
-                </ul>
-                :
-                <div className="info-list__item">
-                    Сообщения о кражах отсутствуют
-                </div>
-            }
-            <NavLink to='/infotheft'>
-                <button className="btn btn__big">Сообщить о краже</button>
-            </NavLink>
-            {/* <p>
-                Object{cases}
-            </p> */}
+            <h1 class="main__title">Информация о кражах</h1>
+            <ul className="info-list">
+                {
+                    reports.length ?
+                    reports.map((e) => (
+                        <OneList report={ e } key={ e._id } type="report"/>
+                    ))
+                    :
+                    <div className="info-list__item">Сообщения о кражах отсутствуют</div>
+                }
+            </ul>
+            <button className="btn btn__big">
+                <a href="/infotheft">Сообщить о краже</a>
+            </button>
         </div>
+        :
+        null
+        }
     </main>
-    )
+  )
 }
 
 export default Thefts;

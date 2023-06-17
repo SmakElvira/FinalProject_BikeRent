@@ -1,34 +1,85 @@
-function Registration () {
+import React from 'react';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { setToken } from '../../api/token.js';
+import { fetchLogin, fetchRegister } from '../../store/userSlice.js';
+
+import { loginField, 
+          loginFieldValue, 
+          loginValidSchema, 
+          regField, 
+          regFieldValue, 
+          regValidSchema } from '../../options/options.js';
+
+import Form from '../form/Form';
+
+function Registration (type) {
+    
+    const dispatch = useDispatch();
+
+    const [processMessage, setProcessMessage] = useState(null);
+
+    const onLoginHandler = async (values) => {
+        dispatch(fetchLogin(values))
+        .then((data) => {
+          if ('error' in data) {
+            setProcessMessage('Неверно введены данные');
+          } else {
+            setProcessMessage('Aвторизация прошла успешно');
+            setToken(data.payload.data.token)
+          }
+        })
+        .catch(() => {
+            setProcessMessage('Ошибка сервера');
+        })
+    };
+
+    const onRegisterHandler = async (values) => {
+        dispatch(fetchRegister(values))
+        .then((data) => {
+          if ('error' in data) {
+            setProcessMessage('Пользователь уже зарегистрирован');
+          } else {
+            setProcessMessage('Регистрация прошла успешно, перенаправляем на вход...');
+    
+            setTimeout(() => {
+              window.location.href = '/login'
+            }, 2000)
+          }
+        })
+        .catch(() => {
+            setProcessMessage('Ошибка сервера');
+        })
+    };
+
     return (
         <main className="main">
-        <div className="container">
-            <h1 className="main__title">
-                Регистрация
-            </h1>
-            <ul className="info-theft">
-                <li className="info-list__item">
-                    <h3 className="item">Email:</h3>
-                    <input className="item__input"></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Пароль:</h3>
-                    <input className="item__input"></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Имя:</h3>
-                    <input className="item__input"></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Фамилия:</h3>
-                    <input className="item__input"></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Client Id:</h3>
-                    <input className="item__input"></input>
-                </li>
-            </ul>
-            <button className="btn btn__big">Зарегистрироваться</button>
-        </div>
+            {
+                type.type === 'registration' ?
+                <Form 
+                    fields={regField}
+                    formValues={regFieldValue} 
+                    validationSchema={regValidSchema} 
+                    onSubmit={onRegisterHandler} 
+                    submitName="Зарегистрироваться"
+                    formName="Регистрация"
+                    processMessage={processMessage}
+                />
+                :
+                type.type === 'login' ?
+                <Form 
+                fields={loginField} 
+                formValues={loginFieldValue} 
+                validationSchema={loginValidSchema} 
+                onSubmit={onLoginHandler} 
+                submitName="Войти"
+                formName="Вход"
+                processMessage={processMessage}
+                />
+                :
+                null
+            }
     </main>
     )
 }

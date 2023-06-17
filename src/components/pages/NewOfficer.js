@@ -1,59 +1,103 @@
-import { useDispatch, useSelector } from 'react-redux';
-// import { useParams } from "react-router-dom";
-// import { officers } from "../../helpers/officersList";
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+import { user } from '../../store/user';
+import { createOfficer, getOfficer, editOfficer } from '../../api/officers';
+import { checkAuth } from '../../utils/checkAuth';
+
+import { officerField,
+          officerFieldValue,
+          officerValidSchema,
+          officerEditField } from '../../options/options';
+
+import Form from '../form/Form';
 
 function InfoOfficer () {
-    // const {id} = useParams();
-    // const officer = officers[id];
-    const dispatch = useDispatch()
-    const officers = useSelector(state => state.officers)
+    const userData = useSelector(user);
 
-    const addOfficer = () => {
+    const [officer, setOfficer] = useState(null);
 
-        const addCase = {
-            email: document.getElementById('email').value,
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            //password: 'kjk542hh',
-            clientId: document.getElementById('clientId').value,
-            approved: document.getElementById('approved').checked
-        }
-        dispatch({type: 'ADD_OFFICERS', payload: addCase})
+    const [processMessage, setProcessMessage] = useState(null);
+
+    const [approved, setApproved] = useState(false);
+
+    const onCreateHandler = (values) => {
+      createOfficer({...values, approved})
+      .then(() => setProcessMessage('Сотрудник успешно зарегистрирован'))
+      .catch((data) => setProcessMessage(data.response.data.message))
     }
 
-    return (
+    const onEditHaldler = (values) => {
+      editOfficer({...values, approved, id: officer._id})
+      .then(() => setProcessMessage('Данные сотрудника успешно изменены'))
+      .catch((data) => setProcessMessage(data.response.data.message))
+    }
+
+    const officerId = window.location.pathname.split('/')[3];
+    
+    useEffect(() => {
+      if (checkAuth(userData.data, userData.status)) {
+        if (officerId) {
+          getOfficer(officerId)
+          .then((data) => {
+            setOfficer(data.data); 
+            setApproved(data.data.approved)
+          })
+          .catch((data) => setProcessMessage(data.response.data.message))
+        }
+      }
+    }, [userData.data, userData.status]);
+
+  if (officerId && officer) {
+      return (
         <main className="main">
+            <div className="container">
+                <Form 
+                    fields={ officerEditField }
+                    formValues={ {firstName: officer.firstName, lastName: officer.lastName} } 
+                    onSubmit={ onEditHaldler }
+                    submitName="Редактировать"
+                    formName="Редактировать сотрудника"
+                    processMessage={ processMessage }
+                    isDirty={true}
+                    isValided={true}
+                >
+                <div className="info-list__item">
+                    <label  htmlFor="approved">Одобрить:</label>
+                    <input type="checkbox" 
+                            name="approved" 
+                            defaultChecked={ officer.approved } 
+                            value={ approved } 
+                            onChange={ () => setApproved(prev => !prev) }
+                    />
+                </div>
+                </Form>
+            </div> 
+      </main>
+      )
+  } else if (!officer && !officerId) {
+    return (
+      <main className="main">
         <div className="container">
-            <h1 className="main__title">
-                Новый сотрудник
-            </h1>
-            <ul className="info-theft">
-                <li className="info-list__item">
-                    <h3 className="item">Фамилия:</h3>
-                    <input className="item item__input" id='lastName'></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Имя:</h3>
-                    <input className="item item__input" id='firstName'></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Email:</h3>
-                    <input className="item item__input" id='email'></input>
-                </li>
-                <li className="info-list__item">
-                    <h3 className="item">Client Id:</h3>
-                    <input className="item item__input" id='clientId'></input>
-                </li>
-                <li className="info-list__item">
-                    <h3>Одобрен:</h3>
-                    <input className="item__input" type="checkbox" id='approved'></input>
-                </li>
-            </ul>
-            <button className="btn btn__big" onClick={() => addOfficer()}>Добавить</button>
-            <button className="btn btn__big" onClick={() => console.log(officers)}>Сообщить</button>
-        </div>
-    </main>
+          <Form 
+            fields={ officerField }
+            formValues={ officerFieldValue } 
+            validationSchema={ officerValidSchema } 
+            onSubmit={ onCreateHandler } 
+            submitName="Создать сотрудника"
+            formName="Создать"
+            processMessage={ processMessage }
+          >
+          <div className="info-list__item">
+            <label htmlFor="approved">Одобрить:</label>
+            <input type="checkbox" name="approved" value={ approved } onChange={ () => setApproved(prev => !prev) }/>
+          </div>
+          </Form>
+        </div> 
+      </main>
     )
+  }
 }
 
 export default InfoOfficer;

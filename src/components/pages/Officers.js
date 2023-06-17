@@ -1,64 +1,57 @@
-import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import OneOfficer from "../oneList/OneOffiser";
+import React from "react";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { useSelector } from 'react-redux';
+
+import { user } from '../../store/user';
+import { getOfficers } from "../../api/officers";
+import { checkAuth } from "../../utils/checkAuth";
+
+import OneList from "../oneList/OneList";
 
 function Officers () {
 
-    // const dispatch = useDispatch()
-    // const officers = useSelector(state => state.officers)
+    const userData = useSelector(user);
 
-    // const deleteOfficer = (key) => {
-    //     dispatch({type: 'DELETE_OFFICERS', payload: key})
-    // }
-
-    const [officers, setOfficers] = useState([]);
+    const [officers, setOfficers] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
-        axios
-            .get('https://sf-final-project-be.herokuapp.com/api/officers') 
-            .then (data => {
-                setOfficers(data.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    })
+        if (checkAuth(userData.data, userData.status)) {
+            getOfficers()
+            .then((data) => setOfficers(data.officers))
+            .catch(() => setErrorMessage('Ошибка: данные о сотрудниках не получены'))
+        } else {
+            window.location.href = '/'
+        }
+    }, [userData.data, userData.status]);
 
-    console.log(officers);
+    const officerIsLoaded = userData.data && userData.status === 'fulfilled' && officers
 
-    return (
-        <main className="main">
+  return (
+    <main className="main">
+        {
+        errorMessage
+        ?
+        <p className="system-message">Ошибка: данные о сотрудниках не получены</p>
+        :
+        officerIsLoaded && !errorMessage
+        ?
         <div className="container">
-            <h1 className="main__title">
-                Сотрудники
-            </h1>
-            {officers.length > 0 ?
-                <ul className="info-list">
-                    {officers.map((officer, index) => {
-                            return(
-                                <OneOfficer
-                                    keys={officer.clientId}
-                                    id={index} 
-                                    lastName={officer.lastName} 
-                                    firstName={officer.firstName}
-                                    //deleteOfficer={deleteOfficer} 
-                                />
-                            )
-                        })}
-                </ul>
-                :
-                <div className="info-list__item">
-                    Данные о сотрудниках отсутствуют
-                </div>
-            }
-            <NavLink to='/newofficer'>
-                <button className="btn btn__big">Добавить сотрудника</button>
-            </NavLink>
+            <h1 class="main__title">Сотрудники</h1>
+            <ul className="info-list">
+                {officers.map((e) => (
+                    <OneList officer={ e } key={ e._id } type="officer"/>
+                ))}
+            </ul>
+        <button className="btn btn__big">
+            <a href="/newofficer">Создать сотрудника</a>
+        </button>
         </div>
+        :
+        null
+        }
     </main>
-    )
+  )
 }
 
 export default Officers;
